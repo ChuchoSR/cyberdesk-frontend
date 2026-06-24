@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import Gaveta from "./components/Gaveta";
 
 // 1. EL MAPA (Tus categorías con los endpoints EXACTOS de tu backend)
 const categorias = [
   { id: "cpu", label: "CPU", section: "internos", icon: "🧠", endpoint: "/procesadores", stock: 30 },
   { id: "motherboard", label: "Motherboard", section: "internos", icon: "⚙️", endpoint: "/placas_madre" },
-  { id: "ram", label: "RAM", section: "internos", icon: "⚡", endpoint: "/ram" },
+  { id: "ram", label: "RAM", section: "internos", icon: "⚡", endpoint: "/memoria_ram" },
   { id: "storage", label: "Almacenamiento", section: "internos", icon: "💾", endpoint: "/almacenamiento" },
   { id: "gpu", label: "GPU", section: "perifericos", icon: "🎮", endpoint: "/tarjetas_video" },
   { id: "psu", label: "PSU", section: "perifericos", icon: "🔌", endpoint: "/fuentes_poder" },
@@ -20,10 +21,12 @@ export default function HardwareInventory() {
   const [cargando, setCargando] = useState(false); // <- Para mostrar un mensaje de "Cargando..." mientras esperamos la respuesta del backend
   const [busqueda, setBusqueda] = useState(""); // <- Para el filtro de búsqueda
 
+
   // 3. EL CLASIFICADOR (Variables derivadas de la memoria)
   const cajonesInternos = categorias.filter(c => c.section === "internos");
   const estantesPerifericos = categorias.filter(c => c.section === "perifericos");
   const infoCajonAbierto = categorias.find(c => c.id === categoriaActiva);
+  
 
   // 4. EL MENSAJERO (El Hook useEffect que va al backend)
   useEffect(() => {
@@ -32,7 +35,9 @@ export default function HardwareInventory() {
       
       setCargando(true); // Empezamos a cargar
       
-      const url = 'http://localhost:3000' + infoCajonAbierto.endpoint;
+      /* const url = 'http://localhost:3000' + infoCajonAbierto.endpoint; */
+      console.log("Mi variable secreta es:", import.meta.env.VITE_URL);
+      const url = import.meta.env.VITE_URL + infoCajonAbierto.endpoint;
       
       fetch(url)
         .then(respuesta => {
@@ -93,6 +98,8 @@ export default function HardwareInventory() {
             onChange={(e) => setBusqueda(e.target.value)} // <- Guardamos lo que el usuario escribe en la barra de búsqueda
             className="bg-neutral-900 border border-neutral-700 text-white p-2 rounded w-full" />
 
+            {/* <Gaveta/> */}
+
             <p className="text-orange-400 font-mono mb-4">
               Ruta consultada: localhost:3000{infoCajonAbierto.endpoint}
             </p>
@@ -118,7 +125,23 @@ export default function HardwareInventory() {
 
                 .map(item => {
                   // 1. ZONA DE LÓGICA
-                  let textoDetalle = "Genérico";
+                  
+                  
+                  
+                  const opcionesBusqueda = {
+                    cpu: item.consumo_watts + "W",
+                    ram: item.capacidad_memoria + "GB - " + item.frecuencia + "MHz",
+                    gpu: item.memoria_vram,
+                    motherboard: item.formato_fisico,
+                    storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB",
+                    psu: item.certificacion + " " + item.potencia_watts + "W",
+                    case: item.tipo_iluminacion + " " + item.formato,
+                    cooling: item.sockets_compatible
+                  }
+
+                  let textoDetalle = opcionesBusqueda[categoriaActiva] || "Genérico"; 
+                  
+                  /* let textoDetalle = "Genérico";
                   
                   if (categoriaActiva === "cpu") {
                     textoDetalle = item.consumo_watts + "W";
@@ -142,7 +165,7 @@ export default function HardwareInventory() {
                     textoDetalle = item.tipo_iluminacion;
                   } else if (categoriaActiva === "cooling") {
                     textoDetalle = item.sockets_compatible;
-                  }
+                  } */
                 
                   // 2. ZONA DE VISUALIZACIÓN
                   return (
