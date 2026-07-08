@@ -7,6 +7,8 @@ export default function App() {
   // 1. EL CEREBRO: Declaramos la memoria de la aplicación
   const [categoriaActiva, setCategoriaActiva] = useState("chasis");
 
+  const [buildActual, setBuildActual] = useState({})
+
   return (
     <div className="h-screen flex flex-col">
       
@@ -18,11 +20,11 @@ export default function App() {
         
         <div className="w-64 bg-gray-900 text-white">
           {/* 2. RETO 1: ¿Cómo modificas esta etiqueta para pasarle la variable y la función? */}
-          <SideBar categoriaActual={categoriaActiva} cambiarCategoria={setCategoriaActiva}/> 
+          <SideBar categoriaActual={categoriaActiva} cambiarCategoria={setCategoriaActiva} buildActual={buildActual}/> 
         </div>
 
         <div className="flex-1 bg-black text-white overflow-auto p-8">
-          <MainSection categoriaVisible={categoriaActiva}/>
+          <MainSection categoriaVisible={categoriaActiva} buildActual={buildActual} setBuildActual={setBuildActual}/>
         </div>
         
       </div>

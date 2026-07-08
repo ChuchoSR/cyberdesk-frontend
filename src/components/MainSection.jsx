@@ -11,7 +11,7 @@ const categorias = [
   { id: "cooling", label: "Refrigeración", endpoint: "/refrigeracion" }
 ];
 
-export default function MainSection({ categoriaVisible }) {
+export default function MainSection({ categoriaVisible, buildActual, setBuildActual }) {
     const [productos, setProductos] = useState([]);
 
     useEffect(() => {
@@ -31,6 +31,7 @@ export default function MainSection({ categoriaVisible }) {
         }
     }, [categoriaVisible]);
 
+    console.log("MI ENSAMBLE ACTUAL ES:", buildActual);
     return (
         <div className="mainSection">
             <h1 className="text-2xl font-bold mb-4 capitalize">Estás viendo: {categoriaVisible}</h1>
@@ -39,6 +40,7 @@ export default function MainSection({ categoriaVisible }) {
                 
                 {productos.map(item => {
                     // 1. ZONA DE LÓGICA: Aquí metemos TU diccionario (el que hiciste ayer)
+                    
                     const opcionesBusqueda = {
                         cpu: item.consumo_watts + "W",
                         ram: item.capacidad_memoria + "GB - " + item.frecuencia + "MHz",
@@ -67,7 +69,18 @@ export default function MainSection({ categoriaVisible }) {
                                 
                                 {/* AQUÍ INYECTAMOS TU VARIABLE MAGICA */}
                                 <span className="text-sm text-neutral-400">{textoDetalle}</span>
-                                
+                                <button 
+                        className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition-colors"
+                        onClick={() => {
+                            setBuildActual({
+                                ...buildActual,
+                                [categoriaVisible]: item
+                            });
+                        }
+                    }
+                    >
+                        Seleccionar
+                    </button>
                             </div>
                         </div>
                     );
