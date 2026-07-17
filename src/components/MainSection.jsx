@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 const categorias = [
-  { id: "cpu", label: "CPU", endpoint: "/procesadores" },
-  { id: "motherboard", label: "Motherboard", endpoint: "/placas_madre" },
-  { id: "ram", label: "RAM", endpoint: "/memoria_ram" },
-  { id: "storage", label: "Almacenamiento", endpoint: "/almacenamiento" },
-  { id: "gpu", label: "GPU", endpoint: "/tarjetas_video" },
-  { id: "psu", label: "PSU", endpoint: "/fuentes_poder" },
-  { id: "case", label: "Case", endpoint: "/gabinetes" },
-  { id: "cooling", label: "Refrigeración", endpoint: "/refrigeracion" }
+    { id: "motherboard", label: "Motherboard", endpoint: "/placas_madre" },
+    { id: "cpu", label: "CPU", endpoint: "/procesadores" },
+    { id: "storage", label: "Almacenamiento", endpoint: "/almacenamiento" },
+    { id: "gpu", label: "GPU", endpoint: "/tarjetas_video" },
+    { id: "psu", label: "PSU", endpoint: "/fuentes_poder" },
+    { id: "case", label: "Case", endpoint: "/gabinetes" },
+    { id: "cooling", label: "Refrigeración", endpoint: "/refrigeracion" },
+    { id: "ram", label: "RAM", endpoint: "/memoria_ram" }
 ];
 
 export default function MainSection({ categoriaVisible, buildActual, setBuildActual }) {
@@ -32,14 +32,79 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
     }, [categoriaVisible]);
 
     console.log("MI ENSAMBLE ACTUAL ES:", buildActual);
+
+    let productosAMostrar = productos;
+    
+        // ADUANA DE PLACAS BASE (Múltiples coladores)
+        if (categoriaVisible === "motherboard") {
+            
+            // Colador 1: CPU (Socket)
+            if (buildActual.cpu) {
+                const { socket } = buildActual.cpu;
+                productosAMostrar = productosAMostrar.filter(mb => mb.socket === socket);
+            }
+            // Colador 2: RAM (Generación RAM)
+            if (buildActual.ram) {
+                const { generacion_ram} = buildActual.ram;
+                productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion_ram);
+            }
+            // Colador 3: Case (Formato Físico)
+            if (buildActual.case) {
+                const { formato_fisico } = buildActual.case;
+                productosAMostrar = productosAMostrar.filter (mb => mb.formato_fisico === formato_fisico);
+            }
+        }
+
+        // ==========================================
+        // ADUANA DE CPU
+        // ==========================================
+        if (categoriaVisible === "cpu") {
+            if (buildActual.motherboard) {
+                const { socket } = buildActual.motherboard;
+                productosAMostrar = productosAMostrar.filter(cpu => cpu.socket === socket);
+            }
+        }
+
+        // ==========================================
+        // ADUANA DE RAM
+        // ==========================================
+        if (categoriaVisible === "ram") {
+            if (buildActual.motherboard) {
+                const {generacion_ram} = buildActual.motherboard;
+                productosAMostrar = productosAMostrar.filter(ram => ram.generacion_ram === generacion_ram);
+            }
+        }
+
+        // ==========================================
+        // ADUANA DE COOlER
+        // ==========================================
+        if (categoriaVisible === 'cooling') {
+            if (buildActual.cpu) {
+                const {socket} = buildActual.cpu;
+                productosAMostrar = productosAMostrar.filter(cooler => cooler.sockets_compatibles.includes(socket))
+            }
+        }
+
+        // ==========================================
+        // ADUANA DE PSU
+        // ==========================================
+        if (categoriaVisible === 'psu') {
+            let piezasElegidas = Object.values(buildActual);
+            let consumoTotal = piezasElegidas.reduce((total, pieza) => {
+                return total + (pieza.consumo_watts || 0);
+            }, 0)
+            let consumoRecomendado = consumoTotal + (0.1 * consumoTotal);
+            productosAMostrar = productosAMostrar.filter(psu => psu.potencia_watts >= consumoRecomendado);
+        }
+
     return (
         <div className="mainSection">
             <h1 className="text-2xl font-bold mb-4 capitalize">Estás viendo: {categoriaVisible}</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 
-                {productos.map(item => {
-                    // 1. ZONA DE LÓGICA: Aquí metemos TU diccionario (el que hiciste ayer)
+                {productosAMostrar.map(item => {
+                    // Conficionamos un objeto con las opciones de búsqueda para cada categoría
                     
                     const opcionesBusqueda = {
                         cpu: item.consumo_watts + "W",

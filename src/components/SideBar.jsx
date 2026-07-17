@@ -1,4 +1,4 @@
-export default function SideBar({ categoriaActual, cambiarCategoria, buildActual }) {
+export default function SideBar({ categoriaActual, cambiarCategoria, buildActual, setBuildActual }) {
 
     const cantidadPiezas = Object.keys(buildActual).length;
     const buildCompleto = cantidadPiezas === 8;
@@ -13,6 +13,21 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 {/* NUEVO: Contador dinámico del progreso */}
                 <div className="bg-neutral-800 text-blue-400 text-xs font-bold px-3 py-2 rounded-lg mb-6 uppercase tracking-wider text-center border border-blue-900/30">
                     Progreso del Build: {Object.keys(buildActual).length} / 8
+                </div>
+
+                <div className="mb-6 flex flex-col gap-2">
+                    {Object.keys(buildActual).map(categoria => {
+                        // 1. Extraemos el objeto completo de la pieza usando la categoría actual
+                        const pieza = buildActual[categoria];
+
+                        // 2. Retornamos el HTML
+                        return (
+                            <div key={categoria} className="bg-neutral-800 p-2 rounded-md text-xs">
+                                <span className="text-blue-400 font-bold uppercase">{categoria}: </span>
+                                <span className="text-white">{pieza.marca} {pieza.modelo}</span>
+                            </div>
+                        );
+                    })}
                 </div>
                 
                 <nav className="flex flex-col gap-2">
@@ -49,6 +64,10 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 <button 
                 disabled={!buildCompleto}
                 className={"w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors" + (buildCompleto ? "" : " opacity-50 cursor-not-allowed")}
+                onClick={() => {
+                    alert('Has completado tu Build! Felicidades!');
+                    setBuildActual({});
+                }}
                 >
                     Finalizar Build
                 </button>

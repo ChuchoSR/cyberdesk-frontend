@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import NavBar from "./components/NavBar.jsx";
 import SideBar from "./components/SideBar.jsx";
-import MainSection from "./components/MainSection.jsx"; // Asumiendo que lo creaste
+import MainSection from "./components/MainSection.jsx"; 
 
 export default function App() {
   // 1. EL CEREBRO: Declaramos la memoria de la aplicación
@@ -19,8 +19,8 @@ export default function App() {
       <div className="flex-1 flex flex-row overflow-hidden">
         
         <div className="w-64 bg-gray-900 text-white">
-          {/* 2. RETO 1: ¿Cómo modificas esta etiqueta para pasarle la variable y la función? */}
-          <SideBar categoriaActual={categoriaActiva} cambiarCategoria={setCategoriaActiva} buildActual={buildActual}/> 
+          
+          <SideBar categoriaActual={categoriaActiva} cambiarCategoria={setCategoriaActiva} buildActual={buildActual} setBuildActual={setBuildActual}/> 
         </div>
 
         <div className="flex-1 bg-black text-white overflow-auto p-8">
