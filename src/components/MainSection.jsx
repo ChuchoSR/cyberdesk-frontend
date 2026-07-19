@@ -45,13 +45,13 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
             }
             // Colador 2: RAM (Generación RAM)
             if (buildActual.ram) {
-                const { generacion_ram} = buildActual.ram;
-                productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion_ram);
+                const { generacion} = buildActual.ram;
+                productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion);
             }
             // Colador 3: Case (Formato Físico)
             if (buildActual.case) {
-                const { formato_fisico } = buildActual.case;
-                productosAMostrar = productosAMostrar.filter (mb => mb.formato_fisico === formato_fisico);
+                const { formato } = buildActual.case;
+                productosAMostrar = productosAMostrar.filter (mb => mb.formato_fisico === formato);
             }
         }
 
@@ -71,7 +71,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         if (categoriaVisible === "ram") {
             if (buildActual.motherboard) {
                 const {generacion_ram} = buildActual.motherboard;
-                productosAMostrar = productosAMostrar.filter(ram => ram.generacion_ram === generacion_ram);
+                productosAMostrar = productosAMostrar.filter(ram => ram.generacion === generacion_ram);
             }
         }
 
@@ -81,7 +81,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         if (categoriaVisible === 'cooling') {
             if (buildActual.cpu) {
                 const {socket} = buildActual.cpu;
-                productosAMostrar = productosAMostrar.filter(cooler => cooler.sockets_compatibles.includes(socket))
+                productosAMostrar = productosAMostrar.filter(cooler => cooler.sockets_compatible?.includes(socket))
             }
         }
 

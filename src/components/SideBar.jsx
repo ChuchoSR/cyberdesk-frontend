@@ -64,10 +64,53 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 <button 
                 disabled={!buildCompleto}
                 className={"w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors" + (buildCompleto ? "" : " opacity-50 cursor-not-allowed")}
-                onClick={() => {
-                    alert('Has completado tu Build! Felicidades!');
-                    setBuildActual({});
-                }}
+                // Reemplaza el onClick actual de tu botón de finalizar por esto:
+
+                    onClick={async () => {
+                        try {
+                            
+                            // El backend necesita un objeto con 'nombres_creador' y los 8 IDs.
+                            // Ojo: Usamos el signo de interrogación (Optional Chaining, ej: buildActual.cpu?.id) 
+                            // por si el usuario dejó alguna pieza en blanco, para que no explote React.
+                            const paqueteParaBackend = {
+                                nombres_creador: "Ingeniero CyberDesk", // Nombre fijo por ahora
+                                cpu_id: buildActual.cpu?.id,
+                                ram_id: buildActual.ram?.id,
+                                almacenamiento_id: buildActual.storage?.id,
+                                psu_id: buildActual.psu?.id,
+                                gabinete_id: buildActual.case?.id,
+                                refrigeracion_id: buildActual.cooling?.id,
+                                mb_id: buildActual.motherboard?.id,
+                                gpu_id: buildActual.gpu?.id
+                            };
+                            
+                            const url = import.meta.env.VITE_URL + "/ensambles";
+                            
+                            const respuesta = await fetch(url, {
+                                method: 'POST',
+
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+
+                                body: JSON.stringify(paqueteParaBackend)
+                                // 3. Define el body (convirtiendo tu 'paqueteParaBackend' a texto JSON)
+                            });
+
+                            if (respuesta.ok) {
+                                const data = await respuesta.json();
+                                console.log("Ensamble guardado con ID:", data.id);
+                                alert('¡Has completado tu Build y está guardado en la Base de Datos!');
+                                setBuildActual({}); // Vaciamos el carrito
+                            } else {
+                                alert('El servidor rechazó el ensamble.');
+                            }
+
+                        } catch (error) {
+                            console.error("Error de red:", error);
+                            alert("Hubo un error al intentar comunicarse con el servidor.");
+                        }
+                    }}
                 >
                     Finalizar Build
                 </button>
