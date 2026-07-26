@@ -12,32 +12,46 @@ const categorias = [
 ];
 
 export default function MainSection({ categoriaVisible, buildActual, setBuildActual }) {
-    const [productos, setProductos] = useState([]);
+    
+    // La bóveda es un objeto {}
+    const [boveda, setBoveda] = useState({}); 
 
+    // useEffect con la lógica del Turbo
     useEffect(() => {
+        // ¿Ya tenemos los datos?
+        if (boveda[categoriaVisible]) {
+            console.log("Cargando instantáneamente", categoriaVisible);
+            return; // Frenamos aquí
+        }
+
         const infoCategoria = categorias.find(categoria => categoria.id === categoriaVisible);
 
         if (infoCategoria && infoCategoria.endpoint) {
+            console.log("Consulta a Postgres por primera vez:", categoriaVisible);
             const url = import.meta.env.VITE_URL + infoCategoria.endpoint;
 
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    setProductos(data);
+                    // Guardamos sin borrar lo anterior
+                    setBoveda(bovedaAnterior => ({
+                        ...bovedaAnterior,
+                        [categoriaVisible]: data
+                    }));
                 })
-                .catch(error => {
-                    console.error("Error al obtener los productos:", error);
-                });
+                .catch(error => console.error("Error de red:", error));
         }
-    }, [categoriaVisible]);
+    }, [categoriaVisible]); 
+
+    // 3. CORREGIDO: Una sola variable extrae los datos de la bóveda
+    let productosAMostrar = boveda[categoriaVisible] || [];
 
     console.log("MI ENSAMBLE ACTUAL ES:", buildActual);
 
-    let productosAMostrar = productos;
-    
-        // ADUANA DE PLACAS BASE (Múltiples coladores)
-        if (categoriaVisible === "motherboard") {
-            
+    // ==========================================
+    // ADUANA DE PLACAS BASE (Múltiples coladores)
+    // ==========================================
+    if (categoriaVisible === "motherboard") {            
             // Colador 1: CPU (Socket)
             if (buildActual.cpu) {
                 const { socket } = buildActual.cpu;
@@ -48,10 +62,20 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                 const { generacion} = buildActual.ram;
                 productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion);
             }
-            // Colador 3: Case (Formato Físico)
+            // Colador 3: Case (Formato Físico) - VERSIÓN DICCIONARIO
             if (buildActual.case) {
                 const { formato } = buildActual.case;
-                productosAMostrar = productosAMostrar.filter (mb => mb.formato_fisico === formato);
+
+                // 1. CREAMOS EL DICCIONARIO (La Ley)
+                const compatibilidadGabinete = {
+                    "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"], 
+                    "Mid-Tower": ["ATX", "Micro-ATX", "Mini-ITX"],           
+                    "Micro-ATX": ["Micro-ATX", "Mini-ITX"],                  
+                    "Mini-ITX": ["Mini-ITX"]
+                };
+                const formatosPermitidos = compatibilidadGabinete[formato] || [];
+                // 3. EL NUEVO COLADOR
+                productosAMostrar = productosAMostrar.filter(mb => formatosPermitidos.includes(mb.formato_fisico));
             }
         }
 
