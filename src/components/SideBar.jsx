@@ -1,3 +1,14 @@
+const menuBotones = [
+    { id: "case", texto: "Case" },
+    { id: "motherboard", texto: "Placa Base" },
+    { id: "cpu", texto: "CPU" },
+    { id: "ram", texto: "Memoria Ram" },
+    { id: "storage", texto: "Almacenamiento" },
+    { id: "gpu", texto: "Tarjeta de Video" },
+    { id: "psu", texto: "Fuente de Poder" },
+    { id: "cooling", texto: "Refrigeración" }
+];
+
 export default function SideBar({ categoriaActual, cambiarCategoria, buildActual, setBuildActual }) {
 
     const TODAS_LAS_CATEGORIAS = ["motherboard", "cpu", "ram", "storage", "gpu", "psu", "case", "cooling"];
@@ -45,30 +56,19 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 </div>
                 
                 <nav className="flex flex-col gap-2">
-                    <button className="text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("case")}>
-                        {categoriaActual === "case" ? "Case (Seleccionado)" : "Case"}
-                    </button>
-                    <button className="text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("motherboard")}>
-                        {categoriaActual === "motherboard" ? "Placa Base (Seleccionado)" : "Placa Base"}
-                    </button>
-                    <button className="text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("cpu")}>
-                        {categoriaActual === "cpu" ? "CPU (Seleccionado)" : "CPU"}
-                    </button>
-                    <button className="text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("ram")}>
-                        {categoriaActual === "ram" ? "Memoria Ram (Seleccionado)" : "Memoria Ram"}
-                    </button>
-                    <button className="text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("storage")}>
-                        {categoriaActual === "storage" ? "Almacenamiento (Seleccionado)" : "Almacenamiento"}
-                    </button>
-                    <button className="text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("gpu")}>
-                        {categoriaActual === "gpu" ? "Tarjeta de Video(Seleccionado)" : "Tarjeta de Video"}
-                    </button>
-                    <button className="text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("psu")}>
-                        {categoriaActual === "psu" ? "Fuente de Poder (Seleccionado)" : "Fuente de Poder"}
-                    </button>
-                    <button className="text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors" onClick={() => cambiarCategoria("cooling")}>
-                        {categoriaActual === "cooling" ? "Refrigeración (Seleccionado)" : "Refrigeración"}
-                    </button>
+                    {menuBotones.map(boton => (
+                        <button
+                            key={boton.id}
+                            onClick={ () => cambiarCategoria(boton.id)}
+                            className= 
+                                {categoriaActual === boton.id ? 
+                                    "text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors font-bold" 
+                                    : 
+                                    "text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors"}
+                        >
+                            {categoriaActual === boton.id ? `${boton.texto} Seleccionado`  : boton.texto}
+                        </button>
+                    ))}
                     
                 </nav>
             </div>
@@ -124,6 +124,12 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 >
                     Finalizar Build
                 </button>
+                <button 
+    onClick={() => setBuildActual({})}
+    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-colors mt-4"
+>
+    Limpiar Carrito
+</button>
             </div>
             
         </div>
