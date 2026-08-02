@@ -122,7 +122,8 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         }
 
     return (
-        <div className="mainSection">
+        <div className=
+            "bg-black rounded-xl p-4 flex flex-col gap-3 border-2 border-neutral-800 transition-all hover:-translate-y-2 duration-300 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-400/40 mainSection">
             <h1 className="text-2xl font-bold mb-4 capitalize">Estás viendo: {categoriaVisible}</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -152,11 +153,10 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                                     <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">{item.marca}</span>
                                     <h3 className="text-lg font-bold text-white leading-tight mt-1">{item.modelo}</h3>
                                 </div>
-                                <span className="bg-neutral-800 text-neutral-300 text-xs px-2 py-1 rounded-md">ID: {item.id}</span>
+                                {/* <span className="bg-neutral-800 text-neutral-300 text-xs px-2 py-1 rounded-md">ID: {item.id}</span> */}
                             </div>
                             <div className="mt-auto pt-4 border-t border-neutral-800">
                                 
-                                {/* AQUÍ INYECTAMOS TU VARIABLE MAGICA */}
                                 <span className="text-sm text-neutral-400">{textoDetalle}</span>
                                 <button 
                         className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition-colors"

@@ -9,7 +9,7 @@ const menuBotones = [
     { id: "cooling", texto: "Refrigeración" }
 ];
 
-export default function SideBar({ categoriaActual, cambiarCategoria, buildActual, setBuildActual }) {
+export default function SideBar({ categoriaActual, cambiarCategoria, buildActual, setBuildActual, verMesa, setVerMesa }) {
 
     const TODAS_LAS_CATEGORIAS = ["motherboard", "cpu", "ram", "storage", "gpu", "psu", "case", "cooling"];
     const cantidadPiezas = Object.keys(buildActual).length;
@@ -22,9 +22,20 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                 <h1 className="text-xl font-bold text-white mb-1">Cajones de componentes</h1>
                 <h3 className="text-sm text-neutral-400 mb-6">Selecciona tu hardware</h3>
                 {/* NUEVO: Contador dinámico del progreso */}
-                <div className="bg-neutral-800 text-blue-400 text-xs font-bold px-3 py-2 rounded-lg mb-6 uppercase tracking-wider text-center border border-blue-900/30">
-                    Progreso del Build: {Object.keys(buildActual).length} / 8
-                </div>
+                <button
+                    
+                    disabled={ cantidadPiezas === 0 }
+                    
+                    onClick={() => setVerMesa(true)}
+                    
+                    className={`w-full py-2 px-4 rounded-lg font-bold transition-all ${
+                        cantidadPiezas === 0 
+                        ? "bg-neutral-800 text-neutral-600 cursor-not-allowed" 
+                        : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                    }`}
+                    >
+                    Progreso del Build: {cantidadPiezas} / 8
+                </button>
 
                 <div className="mb-6 flex flex-col gap-2">
                     {TODAS_LAS_CATEGORIAS.map(categoria => {
