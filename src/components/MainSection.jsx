@@ -115,10 +115,26 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         if (categoriaVisible === 'psu') {
             let piezasElegidas = Object.values(buildActual);
             let consumoTotal = piezasElegidas.reduce((total, pieza) => {
-                return total + (pieza.consumo_watts || 0);
+                return (total + (pieza?.consumo_watts || 0) );
             }, 0)
             let consumoRecomendado = consumoTotal + (0.1 * consumoTotal);
             productosAMostrar = productosAMostrar.filter(psu => psu.potencia_watts >= consumoRecomendado);
+        }
+
+        function manejarSeleccion (item) {
+            if (categoriaVisible === 'motherboard') {
+                                setBuildActual({
+                                    ...buildActual,
+                                    motherboard: item,
+                                    cpu: null,
+                                    ram: null
+                                })
+                            } else {
+                                setBuildActual({
+                                    ...buildActual,
+                                    [categoriaVisible]: item
+                                });
+                            }
         }
 
     return (
@@ -135,7 +151,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                         cpu: item.consumo_watts + "W",
                         ram: item.capacidad_memoria + "GB - " + item.frecuencia + "MHz",
                         gpu: item.memoria_vram,
-                        motherboard: item.formato_fisico,
+                        motherboard: item.formato_fisico + " - " + item.socket + " - " + item.generacion_ram,
                         storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB",
                         psu: item.certificacion + " " + item.potencia_watts + "W",
                         case: item.tipo_iluminacion + " - " + item.formato,
@@ -159,14 +175,9 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                                 
                                 <span className="text-sm text-neutral-400">{textoDetalle}</span>
                                 <button 
-                        className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition-colors"
-                        onClick={() => {
-                            setBuildActual({
-                                ...buildActual,
-                                [categoriaVisible]: item
-                            });
-                        }
-                    }
+                        className=
+                        "mt-3 w-full py-2 rounded-lg font-bold uppercase tracking-widest transition-all duration-300 bg-transparent border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/50"
+                        onClick={() => manejarSeleccion(item)}
                     >
                         Seleccionar
                     </button>
@@ -179,3 +190,6 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         </div>
     );
 }
+
+
+

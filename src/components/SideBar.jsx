@@ -46,7 +46,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                         const estilosCajon = pieza ? "bg-black border-2 border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)] text-white" : "bg-neutral-800 border-2 border-dashed border-neutral-700 text-neutral-500 opacity-60";
 
                         return (
-                            <div key={categoria} className={`p-3 rounded-lg flex flex-col transition-all duration-300 ${estilosCajon}`}>
+                            <div key={categoria} className={`p-0 rounded-lg flex flex-col transition-all duration-300 ${estilosCajon}`}>
 
                                 {/* 3. Renderizado Condicional del Contenido */}
                                 {pieza ? (
@@ -57,7 +57,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                                 ) : (
                                     <>
                                         <span className="text-neutral-500 font-bold uppercase text-[10px] tracking-widest">{categoria} ❌</span>
-                                        <span className="text-sm italic mt-1 text-neutral-600">Esperando selección...</span>
+                                        <span className="text-xs italic mt-1 text-neutral-600">Esperando selección...</span>
                                     </>
                                 )}
 
@@ -66,7 +66,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                     })}
                 </div>
                 
-                <nav className="flex flex-col gap-2">
+                <nav className="flex flex-col gap-0">
                     {menuBotones.map(boton => (
                         <button
                             key={boton.id}
