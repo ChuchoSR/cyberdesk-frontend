@@ -68,10 +68,10 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
 
                 // 1. CREAMOS EL DICCIONARIO (La Ley)
                 const compatibilidadGabinete = {
-                    "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"], 
-                    "Mid-Tower": ["ATX", "Micro-ATX", "Mini-ITX"],           
-                    "Micro-ATX": ["Micro-ATX", "Mini-ITX"],                  
-                    "Mini-ITX": ["Mini-ITX"]
+                    "ATX": ["ATX", "Micro-ATX", "Mini-ITX"],
+                    "Micro-ATX": ["Micro-ATX", "Mini-ITX"],
+                    "Mini-ITX": ["Mini-ITX"],
+                    "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"]
                 };
                 const formatosPermitidos = compatibilidadGabinete[formato] || [];
                 // 3. EL NUEVO COLADOR
@@ -121,6 +121,29 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
             productosAMostrar = productosAMostrar.filter(psu => psu.potencia_watts >= consumoRecomendado);
         }
 
+        // ==========================================
+        // ADUANA DE CASE
+        // ==========================================
+        if (categoriaVisible === 'case') {
+            if (buildActual.motherboard) {
+            const formatoPlaca = buildActual.motherboard.formato_fisico;
+        
+        // El mismo diccionario de compatibilidad
+            const compatibilidadGabinete = {
+            "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"], 
+            "Mid-Tower": ["ATX", "Micro-ATX", "Mini-ITX"],           
+            "Micro-ATX": ["Micro-ATX", "Mini-ITX"],                  
+            "Mini-ITX": ["Mini-ITX"]
+        };
+
+            productosAMostrar = productosAMostrar.filter(gabinete => {
+            const formatosQueSoportaEsteGabinete = compatibilidadGabinete[gabinete.formato] || [];
+            return formatosQueSoportaEsteGabinete.includes(formatoPlaca);
+        });
+    }
+        }
+
+
         function manejarSeleccion (item) {
             if (categoriaVisible === 'motherboard') {
                                 setBuildActual({
@@ -148,8 +171,8 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                     // Conficionamos un objeto con las opciones de búsqueda para cada categoría
                     
                     const opcionesBusqueda = {
-                        cpu: item.consumo_watts + "W",
-                        ram: item.capacidad_memoria + "GB - " + item.frecuencia + "MHz",
+                        cpu: item.consumo_watts + "W" + " - " + item.socket,
+                        ram: item.capacidad_memoria + "GB - " + item.frecuencia + " MHz " + " - " + item.generacion,
                         gpu: item.memoria_vram,
                         motherboard: item.formato_fisico + " - " + item.socket + " - " + item.generacion_ram,
                         storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB",
