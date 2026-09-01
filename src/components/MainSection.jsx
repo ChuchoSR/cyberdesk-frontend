@@ -11,6 +11,17 @@ const categorias = [
     { id: "ram", label: "RAM", endpoint: "/memoria_ram" }
 ];
 
+
+const diccionarioImagenes = {
+    cpu: "/src/assets/cpu/cpu-default.png",
+    motherboard: "/src/assets/mb/mb-default.png",
+    ram: "/src/assets/ram/ram-default.png",
+    storage: "/src/assets/storage/storage-default.png",
+    gpu: "/src/assets/gpu/gpu-default.png",
+    psu: "/src/assets/psu/psu-default.png",
+    case: "/src/assets/case/case-default.png",
+    cooling: "/src/assets/cooling/cooling-default.png"
+};
 export default function MainSection({ categoriaVisible, buildActual, setBuildActual }) {
     
     // La bóveda es un objeto {}
@@ -54,23 +65,22 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
     if (categoriaVisible === "motherboard") {            
             // Colador 1: CPU (Socket)
             if (buildActual.cpu) {
-                const { socket } = buildActual.cpu;
-                productosAMostrar = productosAMostrar.filter(mb => mb.socket === socket);
+                const { socket, consumo_watts } = buildActual.cpu;
+                productosAMostrar = productosAMostrar.filter(mb => mb.socket === socket && mb.limite_watts_cpu >= consumo);
             }
             // Colador 2: RAM (Generación RAM)
             if (buildActual.ram) {
-                const { generacion} = buildActual.ram;
-                productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion);
+                const { generacion, frecuencia, perfil_optimizacion} = buildActual.ram;
+                productosAMostrar = productosAMostrar.filter (mb => mb.generacion_ram === generacion && mb.frecuencia_max_ram >= frecuencia && mb.perfil_optimizacion === perfil_optimizacion);
             }
             // Colador 3: Case (Formato Físico) - VERSIÓN DICCIONARIO
             if (buildActual.case) {
                 const { formato } = buildActual.case;
 
-                // 1. CREAMOS EL DICCIONARIO (La Ley)
+                // Diccionario de gabinetes
                 const compatibilidadGabinete = {
-                    "ATX": ["ATX", "Micro-ATX", "Mini-ITX"],
+                    "Mid-Tower": ["ATX", "Micro-ATX", "Mini-ITX"],
                     "Micro-ATX": ["Micro-ATX", "Mini-ITX"],
-                    "Mini-ITX": ["Mini-ITX"],
                     "Full-Tower": ["E-ATX", "ATX", "Micro-ATX", "Mini-ITX"]
                 };
                 const formatosPermitidos = compatibilidadGabinete[formato] || [];
@@ -84,8 +94,8 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         // ==========================================
         if (categoriaVisible === "cpu") {
             if (buildActual.motherboard) {
-                const { socket } = buildActual.motherboard;
-                productosAMostrar = productosAMostrar.filter(cpu => cpu.socket === socket);
+                const { socket, limite_watts_cpu } = buildActual.motherboard;
+                productosAMostrar = productosAMostrar.filter(cpu => cpu.socket === socket && cpu.consumo_watts <= limite_watts_cpu);
             }
         }
 
@@ -94,8 +104,8 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         // ==========================================
         if (categoriaVisible === "ram") {
             if (buildActual.motherboard) {
-                const {generacion_ram} = buildActual.motherboard;
-                productosAMostrar = productosAMostrar.filter(ram => ram.generacion === generacion_ram);
+                const {generacion_ram, frecuencia_max_ram} = buildActual.motherboard;
+                productosAMostrar = productosAMostrar.filter(ram => ram.generacion === generacion_ram && ram.frecuencia <= frecuencia_max_ram);
             }
         }
 
@@ -171,11 +181,11 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                     // Conficionamos un objeto con las opciones de búsqueda para cada categoría
                     
                     const opcionesBusqueda = {
-                        cpu: item.consumo_watts + "W" + " - " + item.socket,
-                        ram: item.capacidad_memoria + "GB - " + item.frecuencia + " MHz " + " - " + item.generacion,
+                        cpu: item.socket + " - " + "Consumo : " + item.consumo_watts + "W" + " - " + "Gráficos integrados : " + item.grafico_integrados + " - " + "Versión de BIOS : " + item.version_bios_req,                       
+                        ram: item.capacidad_memoria + "GB - " + item.frecuencia + " MHz " + " - " + item.generacion + " - " +"Voltaje : " + item.voltaje + "V" + " - " + "Latencia : " + item.latencia_cl + "cl" +" - " + "Perfil de optimización : " + item.perfil_optimizacion,
                         gpu: item.memoria_vram,
-                        motherboard: item.formato_fisico + " - " + item.socket + " - " + item.generacion_ram,
-                        storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB",
+                        motherboard: item.formato_fisico + " - " + item.socket + " - " + item.generacion_ram + " - " + "Frecuencia máxima" + " : " + item.frecuencia_max_ram + " MHz" + " - " + "Versión de Bios" + " : "+ item.bios_stock + " - " + "Bios flashback : " + item.bios_flashback,
+                        storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB" + " - " + item.formato_fisico + " - " + item.tecnologia,
                         psu: item.certificacion + " " + item.potencia_watts + "W",
                         case: item.tipo_iluminacion + " - " + item.formato,
                         cooling: item.sockets_compatible
@@ -186,25 +196,43 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
 
                     // 2. ZONA DE VISUALIZACIÓN: Retornamos la tarjeta de Tailwind
                     return (
-                        <div key={item.id} className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col gap-3 hover:border-blue-500 transition-colors">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <span className="text-xs font-bold text-blue-500 uppercase tracking-wider">{item.marca}</span>
-                                    <h3 className="text-lg font-bold text-white leading-tight mt-1">{item.modelo}</h3>
-                                </div>
-                                {/* <span className="bg-neutral-800 text-neutral-300 text-xs px-2 py-1 rounded-md">ID: {item.id}</span> */}
-                            </div>
-                            <div className="mt-auto pt-4 border-t border-neutral-800">
+                        <div key={item.id} className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col justify-between hover:border-cyan-500 transition-colors h-full">
+        
+                            {/* BLOQUE SUPERIOR: Imagen + Textos */}
+                            <div className="flex flex-row gap-4 mb-4">
                                 
-                                <span className="text-sm text-neutral-400">{textoDetalle}</span>
-                                <button 
-                        className=
-                        "mt-3 w-full py-2 rounded-lg font-bold uppercase tracking-widest transition-all duration-300 bg-transparent border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-400 hover:text-black hover:shadow-lg hover:shadow-cyan-400/50"
-                        onClick={() => manejarSeleccion(item)}
-                    >
-                        Seleccionar
-                    </button>
+                                {/* Lado Izquierdo: IMAGEN (65%) */}
+                                <div className="w-[35%] bg-neutral-950/50 rounded-lg p-2 flex items-center justify-center border border-neutral-800/50">
+                                    <img 
+                                        src={diccionarioImagenes[categoriaVisible]} 
+                                        alt={`Imagen genérica de ${categoriaVisible}`} 
+                                        className="w-full h-24 object-contain opacity-70 hover:opacity-100 transition-opacity drop-shadow-md"
+                                    />
+                                </div>
+
+                                {/* Lado Derecho: INFO (35%) */}
+                                <div className="w-[65%] flex flex-col justify-center">
+                                    <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">{item.marca}</span>
+                                    <h3 className="text-sm md:text-base font-bold text-white leading-tight mt-1 mb-2">{item.modelo}</h3>
+                                    <span className="text-xs text-neutral-400 leading-snug">{textoDetalle}</span>
+                                    {/* ID Oculto o Pequeño si lo necesitas */}
+                                    <span className="mt-2 text-[9px] text-neutral-600">ID: {item.id}</span>
+                                </div>
+                                
                             </div>
+
+                            {/* BLOQUE INFERIOR: Botón (100% ancho) */}
+                            <button 
+                                className="w-full mt-auto py-2 rounded-lg font-bold text-sm uppercase tracking-widest transition-all duration-300 bg-transparent border border-cyan-700 text-cyan-400 hover:bg-cyan-900/40 hover:border-cyan-400"
+                                onClick={() => {
+                                    setBuildActual({
+                                        ...buildActual,
+                                        [categoriaVisible]: item
+                                    });
+                                }}
+                            >
+                                Seleccionar
+                            </button>
                         </div>
                     );
                 })}
