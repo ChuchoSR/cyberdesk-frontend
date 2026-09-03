@@ -66,7 +66,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
             // Colador 1: CPU (Socket)
             if (buildActual.cpu) {
                 const { socket, consumo_watts } = buildActual.cpu;
-                productosAMostrar = productosAMostrar.filter(mb => mb.socket === socket && mb.limite_watts_cpu >= consumo);
+                productosAMostrar = productosAMostrar.filter(mb => mb.socket === socket && (mb.limite_watts_cpu || 999) >= consumo_watts);
             }
             // Colador 2: RAM (Generación RAM)
             if (buildActual.ram) {
@@ -95,7 +95,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         if (categoriaVisible === "cpu") {
             if (buildActual.motherboard) {
                 const { socket, limite_watts_cpu } = buildActual.motherboard;
-                productosAMostrar = productosAMostrar.filter(cpu => cpu.socket === socket && cpu.consumo_watts <= limite_watts_cpu);
+                productosAMostrar = productosAMostrar.filter(cpu => cpu.socket === socket && cpu.consumo_watts <= (limite_watts_cpu || 999)); // Si no hay límite(porque el resultado es 0), asumimos 999W
             }
         }
 
