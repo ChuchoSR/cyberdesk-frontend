@@ -120,6 +120,17 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
         }
 
         // ==========================================
+        // ADUANA DE GPU
+        // ==========================================
+        if (categoriaVisible === 'gpu') {
+            if (buildActual.case) {
+                const {espacio_maximo_gpu_mm} = buildActual.case;
+                productosAMostrar = productosAMostrar.filter(gpu => gpu.longitud <= (espacio_maximo_gpu_mm || 999)); 
+            }
+        }
+
+
+        // ==========================================
         // ADUANA DE PSU
         // ==========================================
         if (categoriaVisible === 'psu') {
