@@ -1,12 +1,12 @@
 const menuBotones = [
-    { id: "case", texto: "Case" },
-    { id: "motherboard", texto: "Placa Base" },
-    { id: "cpu", texto: "CPU" },
-    { id: "ram", texto: "Memoria Ram" },
-    { id: "storage", texto: "Almacenamiento" },
-    { id: "gpu", texto: "Tarjeta de Video" },
-    { id: "psu", texto: "Fuente de Poder" },
-    { id: "cooling", texto: "Refrigeración" }
+    { id: "case", texto: "Case", icono: "/assets/icons/case.png" },
+    { id: "motherboard", texto: "Placa Base", icono: "/assets/icons/mobo.png" },
+    { id: "cpu", texto: "CPU", icono: "/assets/icons/cpu.png" },
+    { id: "ram", texto: "Memoria Ram", icono: "/assets/icons/ram.png" },
+    { id: "storage", texto: "Almacenamiento", icono: "/assets/icons/almacenamiento.png" },
+    { id: "gpu", texto: "Tarjeta de Video", icono: "/assets/icons/gpu.png" },
+    { id: "psu", texto: "Fuente de Poder", icono: "/assets/icons/psu.png" },
+    { id: "cooling", texto: "Refrigeración", icono: "/assets/icons/cooler.png" }
 ];
 
 export default function SideBar({ categoriaActual, cambiarCategoria, buildActual, setBuildActual, verMesa, setVerMesa }) {
@@ -37,34 +37,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                     Progreso del Build: {cantidadPiezas} / 8
                 </button>
 
-                <div className="mb-6 flex flex-col gap-2">
-                    {TODAS_LAS_CATEGORIAS.map(categoria => {
-                        
-                        // 1. Extraemos la pieza. Si no la has elegido aún, esto valdrá 'undefined'
-                        const pieza = buildActual[categoria];
-
-                        const estilosCajon = pieza ? "bg-black border-2 border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)] text-white" : "bg-neutral-800 border-2 border-dashed border-neutral-700 text-neutral-500 opacity-60";
-
-                        return (
-                            <div key={categoria} className={`p-0 rounded-lg flex flex-col transition-all duration-300 ${estilosCajon}`}>
-
-                                {/* 3. Renderizado Condicional del Contenido */}
-                                {pieza ? (
-                                    <>
-                                        <span className="text-green-400 font-bold uppercase text-[10px] tracking-widest">{categoria} ✅</span>
-                                        <span className="text-sm font-semibold truncate mt-1">{pieza.marca} {pieza.modelo}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="text-neutral-500 font-bold uppercase text-[10px] tracking-widest">{categoria} ❌</span>
-                                        <span className="text-xs italic mt-1 text-neutral-600">Esperando selección...</span>
-                                    </>
-                                )}
-
-                            </div>
-                        );
-                    })}
-                </div>
+                
                 
                 <nav className="flex flex-col gap-0">
                     {menuBotones.map(boton => (
@@ -73,11 +46,15 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                             onClick={ () => cambiarCategoria(boton.id)}
                             className= 
                                 {categoriaActual === boton.id ? 
-                                    "text-left text-white bg-blue-600 px-4 py-2 rounded-lg font-medium transition-colors font-bold" 
+                                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-bold tracking-wide transition-all duration-300 shadow-lg shadow-blue-600/20" 
                                     : 
-                                    "text-left text-neutral-400 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors"}
+                                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 font-medium transition-all duration-300"}
                         >
-                            {categoriaActual === boton.id ? `${boton.texto} Seleccionado`  : boton.texto}
+                            <img src={boton.icono} alt={`Icono de ${boton.texto}`} className="w-6 h-6 opacity-90" />
+                            <span>{categoriaActual === boton.id ? `${boton.texto} Seleccionado` : boton.texto}</span>
+                            {buildActual[boton.id] ? <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] ml-auto"></div>
+                                                    :
+                                                    <div className="w-2 h-2 rounded-full bg-neutral-700 shadow-[0_0_8px_rgba(239,68,68,0.8)] ml-auto"></div>}
                         </button>
                     ))}
                     
