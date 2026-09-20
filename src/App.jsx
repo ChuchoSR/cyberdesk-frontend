@@ -6,7 +6,7 @@ import AssemblyTable from "./components/AssemblyTable.jsx";
 
 export default function App() {
   // 1. EL CEREBRO: Declaramos la memoria de la aplicación
-  const [categoriaActiva, setCategoriaActiva] = useState("chasis");
+  const [categoriaActiva, setCategoriaActiva] = useState("Inicio");
 
   const [buildActual, setBuildActual] = useState({})
 
@@ -26,7 +26,7 @@ export default function App() {
           <SideBar categoriaActual={categoriaActiva} cambiarCategoria={setCategoriaActiva} buildActual={buildActual} setBuildActual={setBuildActual} verMesa={verMesa} setVerMesa={setVerMesa}/> 
         </div>
 
-        <div className="flex-1 bg-black text-white overflow-auto p-8">
+        <div className="flex-1 bg-black text-white overflow-auto p-0">
           {verMesa ? (
             <AssemblyTable buildActual={buildActual} />
           ) : (

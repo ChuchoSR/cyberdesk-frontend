@@ -28,7 +28,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                     
                     onClick={() => setVerMesa(true)}
                     
-                    className={`w-full py-2 px-4 rounded-lg font-bold transition-all ${
+                    className={`w-full py-2 px-4 rounded-lg mb-2 font-bold transition-all ${
                         cantidadPiezas === 0 
                         ? "bg-neutral-800 text-neutral-600 cursor-not-allowed" 
                         : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30"
@@ -39,7 +39,7 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
 
                 
                 
-                <nav className="flex flex-col gap-0">
+                <nav className="flex flex-col gap-2">
                     {menuBotones.map(boton => (
                         <button
                             key={boton.id}
