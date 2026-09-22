@@ -89,7 +89,7 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
 
             {/* 2. LA CORTINA DE HUMO (Animación de opacidad) */}
             <div 
-                className={`absolute inset-0 z-0 pointer-events-none transition-all duration-200 ease-in-out ${
+                className={`absolute inset-0 z-0 pointer-events-none transition-all duration-300 ease-in-out ${
                     esInicio ? "bg-neutral-950/10 backdrop-blur-none" : "bg-neutral-950/60 backdrop-filter: blur"
                 }`}
             ></div>
@@ -121,7 +121,9 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                             Estás viendo: {categoriaVisible}
                         </h1>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10 animate-fade-in"
+                            key={categoriaVisible}
+                        >
                             
                             {productosAMostrar.map(item => {
                                 
