@@ -130,12 +130,12 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
                                 const opcionesBusqueda = {
                                     cpu: item.socket + " - Consumo: " + item.consumo_watts + "W - Gráficos integrados: " + item.grafico_integrados + " - BIOS: " + item.version_bios_req,                       
                                     ram: item.capacidad_memoria + "GB - " + item.frecuencia + " MHz - " + item.generacion + " - Voltaje: " + item.voltaje + "V - Latencia: " + item.latencia_cl + "cl - Perfil: " + item.perfil_optimizacion,
-                                    gpu: item.memoria_vram,
+                                    gpu: item.memoria_vram + " - " + item.tipo_memoria + " - " + "Consumo: " + item.consumo_watts + " W" + " - " +  " Longitud: "+ item.longitud + " mm " + " - " + " Conector de energía: " + item.conectores_energia,
                                     motherboard: item.formato_fisico + " - " + item.socket + " - " + item.generacion_ram + " - Frecuencia máx: " + item.frecuencia_max_ram + " MHz - BIOS: " + item.bios_stock + " - Flashback: " + item.bios_flashback,
-                                    storage: item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB" + " - " + item.formato_fisico + " - " + item.tecnologia,
+                                    storage: (item.capacidad_memoria >= 1000 ? (item.capacidad_memoria / 1000) + " TB" : item.capacidad_memoria + " GB") + " - " + item.formato_fisico + " - " + item.tecnologia,
                                     psu: item.certificacion + " " + item.potencia_watts + "W",
-                                    case: item.tipo_iluminacion + " - " + item.formato,
-                                    cooling: item.sockets_compatible
+                                    case: item.formato + " - " + " Tipo de iluminación: "+ item.tipo_iluminacion + " - " + "Ventiladores incluidos: " + item.ventiladores_incluidos + " - " + " Espacio máximo GPU en mm: " + item.espacio_maximo_gpu_mm + " mm", 
+                                    cooling: "Sockets compatibles: " + item.sockets_compatible + " - " + " Tipo de refrigración: " + item.tipo + " - " + " Tipo_conexión: " + item.tipo_conexion
                                 };
 
                                 let textoDetalle = opcionesBusqueda[categoriaVisible] || "Genérico";
