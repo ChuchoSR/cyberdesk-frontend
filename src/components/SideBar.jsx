@@ -37,7 +37,17 @@ export default function SideBar({ categoriaActual, cambiarCategoria, buildActual
                     Progreso del Build: {cantidadPiezas} / 8
                 </button>
 
-                
+                <button 
+                    onClick={() => cambiarCategoria("reporte")}
+                    disabled={cantidadPiezas === 0}
+                    className={`w-full py-4 px-4 rounded-lg font-bold transition-all mt-2 gap-2 ${
+                        cantidadPiezas === 0 
+                        ? "bg-neutral-800 text-neutral-600 cursor-not-allowed" 
+                        : "bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/30 border border-purple-400"
+                    }`}
+                >
+    🔍              Analizar Ensamble
+                </button>
                 
                 <nav className="flex flex-col gap-2">
                     {menuBotones.map(boton => (

@@ -75,6 +75,188 @@ export default function MainSection({ categoriaVisible, buildActual, setBuildAct
     // Evaluamos el estado inicial blindado contra mayúsculas
     const esInicio = categoriaVisible.toLowerCase() === "inicio"; 
 
+// Interceptor del Reporte de Rendimiento
+    if (categoriaVisible === "reporte") {
+        
+        // --- 1. ESCÁNER DE INTEGRIDAD ---
+        const categoriasVitales = [
+            { id: 'cpu', nombre: 'Procesador' },
+            { id: 'motherboard', nombre: 'Placa Base' },
+            { id: 'ram', nombre: 'Memoria RAM' },
+            { id: 'psu', nombre: 'Fuente de Poder' },
+            { id: 'gpu', nombre: 'Tarjeta de Video' }
+        ];
+
+        const faltantes = categoriasVitales.filter(cat => !buildActual[cat.id]);
+        const setupIncompleto = faltantes.length > 0;
+
+        // --- 2. CÁLCULO DE ENERGÍA ---
+        const piezasElegidas = Object.values(buildActual);
+        const consumoTotal = piezasElegidas.reduce((total, pieza) => total + (pieza?.consumo_watts || 0), 0);
+        const potenciaFuente = buildActual.psu?.potencia_watts || 0;
+        const alertaEnergia = potenciaFuente > 0 && potenciaFuente < (consumoTotal * 1.1);
+
+        // --- 3. RENDIMIENTO TÉRMICO (VRM) ---
+        const tieneVRM = buildActual.cpu && buildActual.motherboard;
+        let porcentajeEstresVRM = 0;
+        let peligroTermico = false;
+
+        if (tieneVRM) {
+            const cpuWatts = buildActual.cpu.consumo_watts || 0;
+            const limitePlaca = buildActual.motherboard.limite_watts_cpu || 999; 
+            porcentajeEstresVRM = Math.round((cpuWatts / limitePlaca) * 100);
+            peligroTermico = porcentajeEstresVRM > 85;
+        }
+
+        // --- 4. CUELLO DE BOTELLA (RAM) ---
+        const tieneRAMyPlaca = buildActual.ram && buildActual.motherboard;
+        let desperdicioRAM = false;
+        let limiteRAMPlaca = 0;
+        let velocidadRAM = 0;
+
+        if (tieneRAMyPlaca) {
+            velocidadRAM = buildActual.ram.frecuencia || 0;
+            limiteRAMPlaca = buildActual.motherboard.frecuencia_max_ram || 9999;
+            desperdicioRAM = velocidadRAM > limiteRAMPlaca;
+        }
+
+        // --- 5. ESCÁNER DE REFRIGERACIÓN (Escudo Térmico) ---
+        const tieneVentilacion = buildActual.cooling && buildActual.case;
+        let escudoTermicoActivo = false;
+
+        if (tieneVentilacion) {
+            const tipoRefrigeracion = buildActual.cooling.tipo || '';
+            const tamanoRadiador = buildActual.cooling.tamano_radiador || 0;
+            const ventiladoresGabinete = buildActual.case.ventiladores_incluidos || 0;
+            escudoTermicoActivo = (tipoRefrigeracion.includes('Liquida') && tamanoRadiador >= 240) || (ventiladoresGabinete >= 3);
+        }
+
+        // --- 6. EL CEREBRO DEL TACÓMETRO ---
+        let puntajeFinal = 100;
+        if (alertaEnergia) puntajeFinal -= 40;
+        if (peligroTermico) puntajeFinal -= 25;
+        if (desperdicioRAM) puntajeFinal -= 15;
+        if (tieneVentilacion && !escudoTermicoActivo) puntajeFinal -= 10;
+        
+        // Evitamos puntajes negativos
+        puntajeFinal = Math.max(0, puntajeFinal);
+
+        // Definimos el color del halo brillante según la nota
+        let colorTacometro = "border-cyan-500 shadow-cyan-500/50 text-cyan-400"; // Excelente
+        if (puntajeFinal < 85) colorTacometro = "border-yellow-500 shadow-yellow-500/50 text-yellow-400"; // Regular
+        if (puntajeFinal < 60 || alertaEnergia || peligroTermico) colorTacometro = "border-red-500 shadow-red-500/50 text-red-500"; // Crítico
+
+        return (
+            <div className="w-full h-full p-6 overflow-y-auto animate-fade-in bg-neutral-950 flex flex-col items-center">
+                
+                {/* Título Principal */}
+                <h2 className="text-3xl font-bold text-white mb-8 border-b border-neutral-800 pb-4 w-full max-w-3xl text-center">
+                    📊 Análisis de Rendimiento
+                </h2>
+
+                <div className="w-full max-w-3xl flex flex-col gap-10 items-center">
+                    
+                    {/* ZONA SUPERIOR: EL TACÓMETRO (ESTILO SPEEDTEST) */}
+                    <div className="flex flex-col items-center justify-center">
+                        <div className={`relative w-56 h-56 rounded-full bg-neutral-900 border-8 ${colorTacometro} shadow-[0_0_30px_rgba(0,0,0,0)] flex items-center justify-center transition-all duration-700`}>
+                            {/* Círculo interno decorativo */}
+                            <div className="absolute inset-2 rounded-full border border-neutral-800"></div>
+                            
+                            <div className="flex flex-col items-center z-10">
+                                {setupIncompleto ? (
+                                    <span className="text-4xl font-extrabold text-neutral-500">--</span>
+                                ) : (
+                                    <span className={`text-6xl font-black ${colorTacometro.split(' ').pop()}`}>
+                                        {puntajeFinal}
+                                    </span>
+                                )}
+                                <span className="text-neutral-400 text-sm tracking-widest uppercase mt-2 font-bold">
+                                    {setupIncompleto ? "En Espera" : "Puntos"}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {!setupIncompleto && (
+                            <p className="mt-4 text-neutral-400 text-sm text-center max-w-md">
+                                Calificación global basada en sinergia, cuellos de botella y seguridad térmica.
+                            </p>
+                        )}
+                    </div>
+
+                    {/* ZONA INFERIOR: LA LISTA DE CHEQUEO (EL PORQUÉ) */}
+                    <div className="w-full flex flex-col gap-4 text-center">
+                        
+                        {setupIncompleto ? (
+                            <div className="p-4 rounded-xl border bg-yellow-900/20 border-yellow-600/50">
+                                <span className="font-bold text-yellow-500 text-lg block mb-1">
+                                    🚧 Análisis Parcial
+                                </span>
+                                <span className="text-neutral-400 text-sm block">
+                                    El tacómetro se activará al agregar: <span className="font-bold text-white">{faltantes.map(f => f.nombre).join(", ")}</span>.
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="p-4 rounded-xl border bg-emerald-900/20 border-emerald-600/50 hidden">
+                                {/* Ocultamos este banner verde porque el tacómetro ya dice que todo está bien */}
+                            </div>
+                        )}
+
+                        {/* Tarjetas Activas */}
+                        {consumoTotal > 0 && (
+                            <div className={`p-4 rounded-xl border ${alertaEnergia ? "bg-red-900/40 border-red-500" : buildActual.psu ? "bg-green-900/20 border-green-500/50" : "bg-neutral-800/50 border-neutral-600"}`}>
+                                <span className="font-bold text-white text-md block mb-1">
+                                    {alertaEnergia ? "⚡ Alerta Crítica de Energía" : buildActual.psu ? "⚡ Suministro Eléctrico Estable" : "⚡ Consumo Estimado"}
+                                </span>
+                                <span className="text-neutral-300 text-sm block">
+                                    Consumo total: <strong>{consumoTotal}W</strong>. 
+                                    {buildActual.psu ? ` Tu fuente entrega ${potenciaFuente}W.` : " Sin fuente seleccionada."}
+                                </span>
+                            </div>
+                        )}
+
+                        {tieneVRM && (
+                            <div className={`p-4 rounded-xl border ${peligroTermico ? "bg-red-900/40 border-red-500" : "bg-green-900/20 border-green-500/50"}`}>
+                                <span className="font-bold text-white text-md block mb-1">
+                                    {peligroTermico ? "⚠️ Peligro Térmico en VRM" : "✅ Estrés Térmico Óptimo"}
+                                </span>
+                                <span className="text-neutral-300 text-sm block">
+                                    El procesador consume el <strong>{porcentajeEstresVRM}%</strong> del límite de tu placa base.
+                                </span>
+                            </div>
+                        )}
+
+                        {tieneRAMyPlaca && (
+                            <div className={`p-4 rounded-xl border ${desperdicioRAM ? "bg-orange-900/40 border-orange-500" : "bg-green-900/20 border-green-500/50"}`}>
+                                <span className="font-bold text-white text-md block mb-1">
+                                    {desperdicioRAM ? "📉 Cuello de Botella en RAM" : "✅ Frecuencia de Memoria Óptima"}
+                                </span>
+                                <span className="text-neutral-300 text-sm block">
+                                    {desperdicioRAM 
+                                        ? `Memoria de ${velocidadRAM}MHz limitada a ${limiteRAMPlaca}MHz por la Placa Base.` 
+                                        : `Corriendo a ${velocidadRAM}MHz sin restricciones.`}
+                                </span>
+                            </div>
+                        )}
+
+                        {tieneVentilacion && (
+                            <div className={`p-4 rounded-xl border ${escudoTermicoActivo ? "bg-cyan-900/20 border-cyan-500/50" : "bg-orange-900/40 border-orange-500"}`}>
+                                <span className="font-bold text-white text-md block mb-1">
+                                    {escudoTermicoActivo ? "❄️ Escudo Térmico Activo" : "⚠️ Flujo de Aire Deficiente"}
+                                </span>
+                                <span className="text-neutral-300 text-sm block">
+                                    {escudoTermicoActivo 
+                                        ? "Tu combinación de chasis y disipación asegura temperaturas seguras." 
+                                        : "Gabinete estándar. Riesgo con piezas de alto consumo."}
+                                </span>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full relative rounded-2xl overflow-hidden flex flex-col items-center justify-center bg-neutral-950">
             
